@@ -7,16 +7,32 @@ import { RxCaretLeft, RxCaretRight } from 'react-icons/rx'
 import { HiHome } from 'react-icons/hi'
 import { BiSearch } from 'react-icons/bi'
 import { Button } from "./button"
+import { useAuthModal } from "@/hooks/use-auth-modal"
+import { useSupabaseClient } from "@supabase/auth-helpers-react"
+import { useUser } from "@/hooks/use-user"
+import { FaUserAlt } from "react-icons/fa"
+import toast from "react-hot-toast"
 
 interface HeaderProps {
   className?: string
 }
 
 export const Header = ({ children, className }: PropsWithChildren<HeaderProps>) => {
+  const authModal = useAuthModal()
   const router = useRouter()
 
-  const handleLogout = () => {
+  const supabaseClient = useSupabaseClient()
+  const { user } = useUser()
 
+  const handleLogout = async () => {
+    const { error } = await supabaseClient.auth.signOut()
+
+    router.refresh()
+    if (error) {
+      toast.error(error.message)
+    } else {
+      toast.success('Logged out!')
+    }
   }
 
   return (
@@ -110,9 +126,26 @@ export const Header = ({ children, className }: PropsWithChildren<HeaderProps>) 
             gap-x-4
           "
         >
-          <>
+          {user ? (
+            <div className={'flex gap-x-4 items-center'}>
+              <Button
+                onClick={handleLogout}
+                className="bg-white px-6 py-2"
+              >
+                Logout
+              </Button>
+              <Button
+                onClick={() => router.push('/account')}
+                className={'bg-white'}
+              >
+                <FaUserAlt />
+              </Button>
+            </div>
+          ) : (
+            <>
             <div>
               <Button
+                onClick={authModal.onOpen} 
                 className="
                   bg-transparent
                   text-neutral-300
@@ -124,7 +157,7 @@ export const Header = ({ children, className }: PropsWithChildren<HeaderProps>) 
             </div>
             <div>
               <Button
-                onClick={() => {}}
+                onClick={authModal.onOpen}
                 className="
                   bg-white
                   px-6
@@ -134,7 +167,8 @@ export const Header = ({ children, className }: PropsWithChildren<HeaderProps>) 
                 Log in
               </Button>
             </div>
-          </>
+            </>
+          )}
         </div>
       </div>
       {children}
