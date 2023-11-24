@@ -2,6 +2,7 @@
 
 import { Song } from "@/types"
 import { MediaItem } from "./media-item"
+import { LikeButton } from "./like-button"
 
 interface SearchContentProps {
   songs: Song[]
@@ -38,7 +39,7 @@ export const SearchContent = ({ songs }: SearchContentProps) => {
               data={song}
             />
           </div>
-          
+          <LikeButton songId={song.id} />
         </div>
       ))}
     </div>
