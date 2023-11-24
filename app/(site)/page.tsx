@@ -1,8 +1,14 @@
+import { getSounds } from '@/actions/get-songs';
 import { Header } from '@/components/header'
 import { ListItem } from '@/components/list-item'
 import Image from 'next/image'
+import { PageContent } from './components/page-content';
 
-export default function Home() {
+export const revalidate = 0;
+
+export default async function Home() {
+  const songs = await getSounds()
+
   return (
     <div className={`
       bg-neutral-900
@@ -49,9 +55,7 @@ export default function Home() {
             Newest songs
           </h1>
         </div>
-        <div>
-          List of Songs!
-        </div>
+        <PageContent songs={songs} />
       </div>
     </div>
   )
